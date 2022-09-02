@@ -33,8 +33,6 @@ class StripeServices
     }
     public function resolveAccessToken()
     {
-        // $credentials = base64_encode("{$this->key}:{$this->secret}");
-
         return "Bearer {$this->secret}";
     }
     public function handlePayment(Request $request)
@@ -51,13 +49,19 @@ class StripeServices
         if (session()->has('paymentIntentId')) {
             $paymentIntentId = session()->get('paymentIntentId');
             $confirmation = $this->confirmPayment($paymentIntentId);
+
+            if ($confirmation->status === 'requires_action') {
+                $clientSecret = $confirmation->client_secret;
+                return view('stripe.3d-secure', compact('clientSecret'));
+            }
+
             if ($confirmation->status === 'succeeded') {
                 $name = $confirmation->charges->data[0]->billing_details->name;
                 $currency = strtolower($confirmation->currency);
                 $amount = $confirmation->amount / $this->resolveCurrencyFactor($currency);
                 return redirect()
                     ->route('home')
-                    ->withSuccess(['payment' => "Thanks,{$name}. We recieved your {$amount} {$currency} payment."]);
+                    ->withSuccess(['payment' => "Thanks, {$name}. We recieved your {$amount} {$currency} payment."]);
             }
         }
         return redirect()->route('home')

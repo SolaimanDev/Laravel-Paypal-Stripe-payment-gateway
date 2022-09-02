@@ -16,7 +16,6 @@ class PaymentController extends Controller
     }
     public function pay(Request $request)
     {
-        // dd($request->all());
         $rulse = [
             'value' => ['required', 'numeric', 'min:5'],
             'currency' => ['required', 'exists:currencies,iso'],
