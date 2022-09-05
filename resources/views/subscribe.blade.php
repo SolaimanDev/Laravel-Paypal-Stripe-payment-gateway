@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
@@ -40,16 +39,16 @@
                                 </label>
                                 <div class="form-group" id="toggler">
                                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                        @foreach ($paymentPlatforms as $paymentPlatform)
-                                        <label class="btn btn-outline-secondary rounded m-2 p-1" data-target="#{{ $paymentPlatform->name }}Collapse" data-toggle="collapse">
-                                            <input type="radio" name="payment_platform" value="{{ $paymentPlatform->id }}" required>
-                                            <img class="img-thumbnail" src="{{ asset($paymentPlatform->image) }}">
+                                        @foreach ($platforms as $platform)
+                                        <label class="btn btn-outline-secondary rounded m-2 p-1" data-target="#{{ $platform->name }}Collapse" data-toggle="collapse">
+                                            <input type="radio" name="payment_platform" value="{{ $platform->id }}" required>
+                                            <img class="img-thumbnail" src="{{ asset($platform->image) }}">
                                         </label>
                                         @endforeach
                                     </div>
-                                    @foreach ($paymentPlatforms as $paymentPlatform)
-                                    <div id="{{ $paymentPlatform->name }}Collapse" class="collapse" data-parent="#toggler">
-                                        @includeIf ('components.' . strtolower($paymentPlatform->name) . '-collapse')
+                                    @foreach ($platforms as $platform)
+                                    <div id="{{ $platform->name }}Collapse" class="collapse" data-parent="#toggler">
+                                        @includeIf ('components.' . strtolower($platform->name) . '-collapse')
                                     </div>
                                     @endforeach
                                 </div>

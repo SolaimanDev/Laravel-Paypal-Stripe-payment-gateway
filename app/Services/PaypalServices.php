@@ -21,7 +21,7 @@ class PaypalServices
         $this->baseUri = config('services.paypal.base_uri');
         $this->clientId = config('services.paypal.client_id');
         $this->clientSecret = config('services.paypal.client_secret');
-        // $this->plans = config('services.paypal.plans');
+        $this->plans = config('services.paypal.plans');
     }
     public function resolveAuthorization(&$queryParams, &$formParams, &$headers)
     {
@@ -64,6 +64,56 @@ class PaypalServices
         }
         return redirect()->route('home')
             ->withErrors('We cannot capture the payment. Try again, please');
+    }
+    public function validateSubscription(Request $request)
+    {
+        if (session()->has('subscriptionId')) {
+            $subscriptionId = session()->get('subscriptionId');
+            session()->forget('subscriptionId');
+            return $request->subscription_id == $subscriptionId;
+        }
+        return false;
+    }
+    public function handleSubscription(Request $request)
+    {
+        $subscriptions = $this->createSubscription(
+            $request->plan,
+            $request->user()->name,
+            $request->user()->email,
+        );
+        $subscriptionLinks = collect($subscriptions->links);
+
+        $approve = $subscriptionLinks->where('rel', 'approve')->first();
+
+        session()->put('subscriptionId', $subscriptions->id);
+        return redirect($approve->href);
+    }
+    public function createSubscription($planSlug, $name, $email)
+    {
+        return $this->makeRequest(
+            'POST',
+            '/v1/billing/subscriptions',
+            [],
+            [
+                'plan_id' => $this->plans[$planSlug],
+                'subscriber' => [
+                    'name' => [
+                        'given_name' => $name,
+
+                    ],
+                    'email_address' => $email
+                ],
+                'application_context' => [
+                    'brand_name' => config('app.name'),
+                    'shipping_preference' => 'NO_SHIPPING',
+                    'user_action' => 'SUBSCRIBE_NOW',
+                    'return_url' => route('subscribe.approval', ['plan' => $planSlug]),
+                    'cancel_url' => route('subscribe.cancelled'),
+                ]
+            ],
+            [],
+            $isJsonRequest = true,
+        );
     }
     public function createOrder($value, $currency)
     {

@@ -24,12 +24,21 @@ return [
         'client_id' => env('PAYPAL_CLIENT_ID'),
         'client_secret' => env('PAYPAL_CLIENT_SECRET'),
         'class' => App\Services\PaypalServices::class,
+        'plans' => [
+            'monthly' => env('PAYPAL_MONTHLY_PLAN'),
+            'yearly' => env('PAYPAL_YEARLY_PLAN'),
+        ]
     ],
     'stripe' => [
         'base_uri' => env('STRIPE_BASE_URI'),
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
         'class' => App\Services\StripeServices::class,
+        'plans' => [
+            'monthly' => env('STRIPE_MONTHLY_PLAN'),
+            'yearly' => env('STRIPE_YEARLY_PLAN'),
+        ]
+
     ],
 
     'postmark' => [

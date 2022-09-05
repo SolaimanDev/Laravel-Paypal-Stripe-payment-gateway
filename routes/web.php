@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SubscribeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +31,10 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::post('/payments/pay', [PaymentController::class, 'pay'])->name('pay');
 Route::get('/payments/approval', [PaymentController::class, 'approval'])->name('approval');
 Route::get('/payments/cancelled', [PaymentController::class, 'cancelled'])->name('cancelled');
+
+Route::prefix('subscribe')->name('subscribe.')->group(function () {
+    Route::get('/', [SubscribeController::class, 'show'])->name('show');
+    Route::post('/', [SubscribeController::class, 'store'])->name('store');
+    Route::get('/approval', [SubscribeController::class, 'approval'])->name('approval');
+    Route::get('/cancelled', [SubscribeController::class, 'cancelled'])->name('cancelled');
+});
